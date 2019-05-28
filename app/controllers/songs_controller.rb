@@ -1,5 +1,9 @@
+require 'pry'
 class SongsController < ApplicationController
+  before_action :set_preferences, only: [:index, :new]
+
   def index
+    @songs = Song.all
     if params[:artist_id]
       @artist = Artist.find_by(id: params[:artist_id])
       if @artist.nil?
@@ -7,9 +11,11 @@ class SongsController < ApplicationController
       else
         @songs = @artist.songs
       end
-    else
-      @songs = Song.all
     end
+    # binding.pry
+    # puts "done"
+    @songs = @songs.sort_by{|song| song.title}
+    @songs.reverse! if @preferences && @preferences.song_sort_order == "DESC"
   end
 
   def show
@@ -26,6 +32,9 @@ class SongsController < ApplicationController
 
   def new
     @song = Song.new
+    if !@preferences.allow_create_songs
+      redirect_to songs_path
+    end
   end
 
   def create
@@ -66,5 +75,9 @@ class SongsController < ApplicationController
   def song_params
     params.require(:song).permit(:title, :artist_name)
   end
-end
 
+  def set_preferences
+    @preferences = Preference.first
+  end
+
+end
