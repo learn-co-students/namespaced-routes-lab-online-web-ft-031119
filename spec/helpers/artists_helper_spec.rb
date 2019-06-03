@@ -1,4 +1,4 @@
-require 'rails_helper'
+learrequire 'rails_helper'
 
 RSpec.describe ArtistsHelper, type: :helper do
 
